@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: rpg-application
+Bundle-SymbolicName: rpg-application
+Bundle-Version: 1.0.0.qualifier
+Export-Package: nz.ac.auckland.parolee.domain,
+ nz.ac.auckland.parolee.dto,
+ nz.ac.auckland.parolee.jaxb,
+ nz.ac.auckland.parolee.services
