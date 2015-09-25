@@ -1,18 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>nz.ac.auckland</groupId>
-  <artifactId>rpg-application</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>rpg-application</name>
-  <description>Role Playing Game Simulation Application</description>
-
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>nz.ac.auckland</groupId>
+	<artifactId>rpg-application</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>rpg-application</name>
+	<description>Role Playing Game Simulation Application</description>
 	<properties>
-		<servlet.container.port>10000</servlet.container.port>
+		<servlet.container.port>8080</servlet.container.port>
 	</properties>
 
 	<dependencies>
-		<!--  JAX-RS dependencies. -->
+		<!-- JAX-RS dependencies. -->
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
@@ -33,7 +32,27 @@
 			<artifactId>resteasy-servlet-initializer</artifactId>
 			<version>3.0.9.Final</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.187</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>4.3.8.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.0.3.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<version>1.0.2</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- Required for JAXB. -->
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
@@ -60,14 +79,14 @@
 			<version>3.4</version>
 		</dependency>
 
-		<!--  Date/time library. -->
+		<!-- Date/time library. -->
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>2.7</version>
 		</dependency>
 
-		<!--  Logging dependencies. -->
+		<!-- Logging dependencies. -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -78,7 +97,7 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.12</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -157,4 +176,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	</project>
+</project>
