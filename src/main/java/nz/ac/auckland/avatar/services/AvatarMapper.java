@@ -13,12 +13,13 @@ public class AvatarMapper {
 
 	static Avatar toDomainModel(nz.ac.auckland.avatar.dto.Avatar dtoavatar) {
 		Avatar fullavatar = new Avatar(dtoavatar.getId(),
-				dtoavatar.getLastname(),
+				dtoavatar.getUsername(),
 				dtoavatar.getFirstname(),
-				dtoavatar.getGender(),
+				dtoavatar.getCategory(),
 				dtoavatar.getDateOfBirth(),
 				dtoavatar.getHomeAddress(),
-				dtoavatar.getCurfew());
+				dtoavatar.getCurfew(), 
+				dtoavatar.getBag());
 		return fullavatar;
 	}
 	
@@ -26,13 +27,14 @@ public class AvatarMapper {
 		nz.ac.auckland.avatar.dto.Avatar dtoavatar = 
 				new nz.ac.auckland.avatar.dto.Avatar(
 						avatar.getId(),
-						avatar.getLastname(),
+						avatar.getUsername(),
 						avatar.getFirstname(),
-						avatar.getGender(),
+						avatar.getCategory(),
 						avatar.getDateOfBirth(),
 						avatar.getHomeAddress(),
 						avatar.getCurfew(),
-						avatar.getLastKnownPosition());
+						avatar.getLastKnownPosition(),
+						avatar.getBag());
 		return dtoavatar;
 		
 	}

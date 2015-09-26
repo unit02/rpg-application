@@ -27,10 +27,12 @@ import org.slf4j.LoggerFactory;
 
 import nz.ac.auckland.avatar.domain.Address;
 import nz.ac.auckland.avatar.domain.Avatar;
+import nz.ac.auckland.avatar.domain.Bag;
+import nz.ac.auckland.avatar.domain.Bag.ItemType;
+import nz.ac.auckland.avatar.domain.Category;
 import nz.ac.auckland.avatar.domain.Curfew;
 import nz.ac.auckland.avatar.domain.Profile;
 import nz.ac.auckland.avatar.domain.Profile.Offence;
-import nz.ac.auckland.avatar.domain.Gender;
 import nz.ac.auckland.avatar.domain.GeoPosition;
 import nz.ac.auckland.avatar.domain.Movement;
 import nz.ac.auckland.avatar.services.AvatarMapper;
@@ -113,11 +115,12 @@ public class AvatarResource {
 		// Update the Avatar object in the database based on the data in
 		// shortAvatar.
 		Avatar.setFirstname(dtoAvatar.getFirstname());
-		Avatar.setLastname(dtoAvatar.getLastname());
-		Avatar.setGender(dtoAvatar.getGender());
+		Avatar.setUsername(dtoAvatar.getUsername());
+		Avatar.setCategory(dtoAvatar.getCategory());
 		Avatar.setDateOfBirth(dtoAvatar.getDateOfBirth());
 		Avatar.setHomeAddress(dtoAvatar.getHomeAddress());
 		Avatar.setCurfew(dtoAvatar.getCurfew());
+		Avatar.setBag(dtoAvatar.getBag());
 
 		// Ignore the last known location in dtoAvatar (i.e. the data in the
 		// HTTP request header).
@@ -135,11 +138,11 @@ public class AvatarResource {
 		// Get the full Avatar object from the database.
 		Avatar Avatar = findAvatar(id);
 		
-		// Lookup the dissassociate Avatar instances in the database.
+		// Lookup the friend Avatar instances in the database.
 		Set<Avatar> friendsInDatabase = new HashSet<Avatar>();
 		for(nz.ac.auckland.avatar.dto.Avatar dtoAvatar : friends) {
-			Avatar dissassociate = findAvatar(dtoAvatar.getId());
-			friendsInDatabase.add(dissassociate);
+			Avatar friend = findAvatar(dtoAvatar.getId());
+			friendsInDatabase.add(friend);
 		}
 		
 		// Update the Avatar by setting its friends.
@@ -152,14 +155,14 @@ public class AvatarResource {
 	 * @param profile the Avatar's updated criminal profile.
 	 */
 	@PUT
-	@Path("{id}/criminal-profile")
+	@Path("{id}/bag")
 	@Consumes("application/xml")
-	public void updateCriminalProfile(@PathParam("id") long id, Profile profile) {
+	public void updateBag(@PathParam("id") long id, Bag bag) {
 		// Get the full Avatar object from the database.
 		Avatar Avatar = findAvatar(id);
 		
-		// Update the Avatar's criminal profile.
-		Avatar.setCriminalProfile(profile);
+		// Update the Avatar's bag
+		Avatar.setBag(bag);
 	}
 
 	/**
@@ -236,8 +239,8 @@ public class AvatarResource {
 
 		List<nz.ac.auckland.avatar.dto.Avatar> friends = new ArrayList<nz.ac.auckland.avatar.dto.Avatar>();
 
-		for (Avatar dissassociate : Avatar.getFriends()) {
-			friends.add(AvatarMapper.toDto(dissassociate));
+		for (Avatar friend : Avatar.getFriends()) {
+			friends.add(AvatarMapper.toDto(friend));
 		}
 		return friends;
 	}
@@ -247,13 +250,13 @@ public class AvatarResource {
 	 * @param id the unique identifier of the Avatar.
 	 */
 	@GET
-	@Path("{id}/criminal-profile")
+	@Path("{id}/bag")
 	@Produces("application/xml")
-	public Profile getCriminalProfile(@PathParam("id") long id) {
+	public Bag getAvatarBag(@PathParam("id") long id) {
 		// Get the full Avatar object from the database.
 		Avatar Avatar = findAvatar(id);
 		
-		return Avatar.getProfile();
+		return Avatar.getBag();
 	}
 	
 	
@@ -269,50 +272,44 @@ public class AvatarResource {
 		long id = _idCounter.incrementAndGet();
 		Address address = new Address("15", "Bermuda road", "St Johns", "Auckland", "1071");
 		Avatar Avatar = new Avatar(id,
-				"Sinnen", 
+				"ellieille", 
 				"Oliver", 
-				Gender.MALE,
+				Category.MAGE,
 				new LocalDate(1970, 5, 26),
 				address,
-				new Curfew(address, new LocalTime(20, 00),new LocalTime(06, 30)));
+				new Curfew(address, new LocalTime(20, 00),new LocalTime(06, 30)),
+				null);
 		_AvatarDB.put(id, Avatar);
 
-		Profile profile = new Profile();
-		profile.addConviction(new Profile.Conviction(new LocalDate(
-				1994, 1, 19), "Crime of passion", Offence.MURDER,
-				Offence.POSSESION_OF_OFFENSIVE_WEAPON));
-		Avatar.setCriminalProfile(profile);
-
-		DateTime now = new DateTime();
-		DateTime earlierToday = now.minusHours(1);
-		DateTime yesterday = now.minusDays(1);
-		GeoPosition position = new GeoPosition(-36.852617, 174.769525);
-
-		Avatar.addMovement(new Movement(yesterday, position));
-		Avatar.addMovement(new Movement(earlierToday, position));
-		Avatar.addMovement(new Movement(now, position));
+		Bag bag = new Bag();
+		
+		bag.addItem(new Bag.Item(5, 
+				"Able to replenish a small amount of mana", 
+				ItemType.MANA_POTION));
+		Avatar.setBag(bag);
 		
 		// === Initialise Avatar #2
 		id = _idCounter.incrementAndGet();
 		address = new Address("22", "Tarawera Terrace", "St Heliers", "Auckland", "1071");
 		Avatar = new Avatar(id,
-				"Watson", 
+				"lavitasy", 
 				"Catherine", 
-				Gender.FEMALE,
+				Category.MONK,
 				new LocalDate(1970, 2, 9),
 				address,
-				null);
+				null, new Bag());
 		_AvatarDB.put(id, Avatar);
 		
 		// === Initialise Avatar #3
 		id = _idCounter.incrementAndGet();
 		address = new Address("67", "Drayton Gardens", "Oraeki", "Auckland", "1071");
 		Avatar = new Avatar(id,
-				"Giacaman", 
+				"i_dont_know", 
 				"Nasser", 
-				Gender.MALE,
+				Category.BARBARIAN,
 				new LocalDate(1980, 10, 19),
 				address,
+				null,
 				null);
 		_AvatarDB.put(id, Avatar);
 	}

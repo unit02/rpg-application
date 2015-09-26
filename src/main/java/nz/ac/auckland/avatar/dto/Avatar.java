@@ -8,8 +8,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import nz.ac.auckland.avatar.domain.Address;
+import nz.ac.auckland.avatar.domain.Bag;
 import nz.ac.auckland.avatar.domain.Curfew;
-import nz.ac.auckland.avatar.domain.Gender;
+import nz.ac.auckland.avatar.domain.Category;
 import nz.ac.auckland.avatar.domain.Movement;
 import nz.ac.auckland.parolee.jaxb.LocalDateAdapter;
 
@@ -41,14 +42,14 @@ public class Avatar {
 	@XmlAttribute(name="id")
 	private long _id;
 	
-	@XmlElement(name="last-name")
-	private String _lastname;
+	@XmlElement(name="user-name")
+	private String _username;
 	
 	@XmlElement(name="first-name")
 	private String _firstname;
 	
-	@XmlElement(name="gender")
-	private Gender _gender;
+	@XmlElement(name="category")
+	private Category _category;
 	
 	@XmlElement(name="date-of-birth")
 	@XmlJavaTypeAdapter(value=LocalDateAdapter.class)
@@ -63,6 +64,9 @@ public class Avatar {
 	@XmlElement(name="last-known-position")
 	private Movement _lastKnownPosition;
 	
+	@XmlElement(name="bag")
+	private Bag _bag;
+	
 	protected Avatar() {
 		
 	}
@@ -76,13 +80,14 @@ public class Avatar {
 	 * which is optional (not all Avatars are subject to a curfew).
      *
 	 */
-	public Avatar(String lastname,
+	public Avatar(String username,
 			String firstname,
-			Gender gender,
+			Category category,
 			LocalDate dateOfBirth,
 			Address homeAddress,
-			Curfew curfew) throws IllegalArgumentException {
-		this(0,lastname,firstname,gender,dateOfBirth,homeAddress,curfew,null);
+			Curfew curfew,
+			Bag bag) throws IllegalArgumentException {
+		this(0,username,firstname,category,dateOfBirth,homeAddress,curfew, null, bag );
 	}
 	
 	/**
@@ -92,33 +97,35 @@ public class Avatar {
 	 * object.
 	 */
 	public Avatar(long id,
-			String lastname,
+			String username,
 			String firstname,
-			Gender gender,
+			Category category,
 			LocalDate dateOfBirth,
 			Address homeAddress,
 			Curfew curfew,
-			Movement lastKnownPosition) {
+			Movement lastKnownPosition,
+			Bag bag) {
 		_id = id;
-		_lastname = lastname;
+		_username = username;
 		_firstname = firstname;
-		_gender = gender;
+		_category = category;
 		_dateOfBirth = dateOfBirth;
 		_homeAddress = homeAddress;
 		_curfew = curfew;
 		_lastKnownPosition = lastKnownPosition;
+		_bag = bag;
 	}
 	
 	public long getId() {
 		return _id;
 	}
 	
-	public String getLastname() {
-		return _lastname;
+	public String getUsername() {
+		return _username;
 	}
 	
-	public void setLastname(String lastname) {
-		_lastname = lastname;
+	public void setUsername(String username) {
+		_username = username;
 	}
 	
 	public String getFirstname() {
@@ -129,12 +136,12 @@ public class Avatar {
 		_firstname = firstname;
 	}
 	
-	public Gender getGender() {
-		return _gender;
+	public Category getCategory() {
+		return _category;
 	}
 	
-	public void setGender(Gender gender) {
-		_gender = gender;
+	public void setCategory(Category gender) {
+		_category = gender;
 	}
 	
 	public LocalDate getDateOfBirth() {
@@ -165,6 +172,10 @@ public class Avatar {
 		return _lastKnownPosition;
 	}
 	
+	public Bag getBag() {
+		return _bag;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
@@ -175,16 +186,16 @@ public class Avatar {
 		buffer.append("Avatar: { [");
 		buffer.append(_id);
 		buffer.append("]; ");
-		if(_lastname != null) {
-			buffer.append(_lastname);
+		if(_username != null) {
+			buffer.append(_username);
 			buffer.append(", ");
 		}
 		if(_firstname != null) {
 			buffer.append(_firstname);
 		}
 		buffer.append("; ");
-		if(_gender != null) {
-			buffer.append(_gender);
+		if(_category != null) {
+			buffer.append(_category);
 		}
 		buffer.append("; ");
 		
@@ -212,7 +223,12 @@ public class Avatar {
 		} else {
 			buffer.append("No curfew conditions");
 		}
-		
+		buffer.append("\n  ");
+		if(_bag != null) {
+			buffer.append(_bag);
+		} else {
+			buffer.append("Not holding any items at present");
+		}
 		buffer.append(" }");
 		
 		return buffer.toString();
@@ -225,14 +241,15 @@ public class Avatar {
         if (obj == this)
             return true;
 
-        Avatar rhs = (Avatar) obj;
+        Avatar ava = (Avatar) obj;
         return new EqualsBuilder().
-            append(_id, rhs._id).
-            append(_lastname, rhs._lastname).
-            append(_firstname, rhs._firstname).
-            append(_gender, rhs._gender).
-            append(_dateOfBirth, rhs._dateOfBirth).
-            append(_homeAddress, rhs._homeAddress).
+            append(_id, ava._id).
+            append(_username, ava._username).
+            append(_firstname, ava._firstname).
+            append(_category, ava._category).
+            append(_dateOfBirth, ava._dateOfBirth).
+            append(_homeAddress, ava._homeAddress).
+            append(_bag, ava._bag).
             isEquals();
 	}
 	
@@ -240,11 +257,12 @@ public class Avatar {
 	public int hashCode() {
 		return new HashCodeBuilder(17, 31). 
 	            append(_id).
-	            append(_lastname).
+	            append(_username).
 	            append(_firstname).
-	            append(_gender).
+	            append(_category).
 	            append(_dateOfBirth).
 	            append(_homeAddress).
+	            append(_bag).
 	            toHashCode();
 	}
 }

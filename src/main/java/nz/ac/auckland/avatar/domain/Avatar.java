@@ -16,48 +16,50 @@ import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Class to represent a Avatar. A Avatar is described by:
- * - Personal details: lastname, firstname, gender, date-of-birth, home address;
+ * - Personal details: username, firstname, gender, date-of-birth, home address;
  * - Curfew: any constraints on the Avatar's location;
- * - Criminal profile: criminal history of the Avatar;
+ * - Bag: Holds the info regarding which items the avatar has;
  * - Friends: other Avatar who the Avatar is not permitted to be with;
- * - Movements: a timestamped history of where the Avatar has been.
+ * - Achievements: a timestamped history of where the Avatar has been.
  * 
  * A Avatar is uniquely identified by an id value of type Long.
  * 
  */
-@Entity
+//@Entity
 public class Avatar {
 	//@Id
 	//generator
 	private long _id;
 	//@Colummn nullable = false, add many to one etc mapped by
-	private String _lastname;
+	private String _username;
 	private String _firstname;
-	private Gender _gender;
+	private Category _category;
 	private LocalDate _dateOfBirth;
 	private Address _homeAddress;
 	private Curfew _curfew;
-	private Profile _profile;
+	private Bag _bag;
 	private Set<Avatar> _friends;
-	private List<Movement> _movements;
+	private List<Achievement> _achievements;
 	
 	
 	public Avatar(long id,
-			String lastname,
+			String username,
 			String firstname,
-			Gender gender,
+			Category category,
 			LocalDate dateOfBirth,
 			Address address,
-			Curfew curfew) {
+			Curfew curfew,
+			Bag bag) {
 		_id = id;
-		_lastname = lastname;
+		_username = username;
 		_firstname = firstname;
-		_gender = gender;
+		_category = category;
 		_dateOfBirth = dateOfBirth;
 		_homeAddress = address;
 		_curfew = curfew;
+		_bag = bag;
 		_friends = new HashSet<Avatar>();
-		_movements = new ArrayList<Movement>();
+		_achievements = new ArrayList<Achievement>();
 	}
 	
 
@@ -69,12 +71,12 @@ public class Avatar {
 		_id = id;
 	}
 	
-	public String getLastname() {
-		return _lastname;
+	public String getUsername() {
+		return _username;
 	}
 	
-	public void setLastname(String lastname) {
-		_lastname = lastname;
+	public void setUsername(String username) {
+		_username = username;
 	}
 	
 	public String getFirstname() {
@@ -85,12 +87,12 @@ public class Avatar {
 		_firstname = firstname;
 	}
 	
-	public Gender getGender() {
-		return _gender;
+	public Category getCategory() {
+		return _category;
 	}
 	
-	public void setGender(Gender gender) {
-		_gender = gender;
+	public void setCategory(Category gender) {
+		_category = gender;
 	}
 	
 	public LocalDate getDateOfBirth() {
@@ -117,43 +119,35 @@ public class Avatar {
 		_curfew = curfew;
 	}
 	
-	public Profile getProfile() {
-		return _profile;
+	public Bag getBag() {
+		return _bag;
 	}
 	
-	public void setCriminalProfile(Profile profile) {
-		_profile = profile;
+	public void setBag(Bag bag) {
+		_bag = bag;
 	}
 	
-	public void addMovement(Movement movement) {
-		// Store the new movement.
-		_movements.add(movement);
+	
+	public void addAchievement(Achievement achievement) {
+		// Store the new achievement.
+		_achievements.add(achievement);
 		
-		// Ensure that movements are sorted in descending order (i.e. that the
-		// most recent movement appears first.
-		Collections.sort(_movements, Collections.reverseOrder());
+		// Ensure that achievements are sorted in descending order (i.e. that the
+		// most recent achievement appears first.
+		Collections.sort(_achievements, Collections.reverseOrder());
 	}
 	
-	public List<Movement> getMovements() {
-		// Returns the Avatar's movements in a read-only collection.
-		return Collections.unmodifiableList(_movements);
+	public List<Achievement> getAchievements() {
+		// Returns the Avatar's achievements in a read-only collection.
+		return Collections.unmodifiableList(_achievements);
 	}
 	
-	public Movement getLastKnownPosition() {
-		Movement movement = null;
-		
-		if(!_movements.isEmpty()) {
-			movement = _movements.get(0);
-		}
-		return movement;
+	public void addFriend(Avatar avatar) {
+		_friends.add(avatar);
 	}
 	
-	public void addFriedn(Avatar parolee) {
-		_friends.add(parolee);
-	}
-	
-	public void removeFriend(Avatar parolee) {
-		_friends.remove(parolee);
+	public void removeFriend(Avatar avatar) {
+		_friends.remove(avatar);
 	}
 	
 	public Set<Avatar> getFriends() {
@@ -174,17 +168,17 @@ public class Avatar {
 		buffer.append("Avatar: { [");
 		buffer.append(_id);
 		buffer.append("]; ");
-		if(_lastname != null) {
-			buffer.append(_lastname);
+		if(_username != null) {
+			buffer.append(_username);
 			buffer.append(", ");
 		}
 		if(_firstname != null) {
 			buffer.append(_firstname);
 		}
 		buffer.append("; ");
-		if(_gender != null) {
-			buffer.append(_gender);
-		}
+		if(_category != null) {
+			buffer.append(_category);
+			}
 		buffer.append("; ");
 		
 		if(_dateOfBirth != null) {
@@ -212,10 +206,10 @@ public class Avatar {
 		}
 		
 		buffer.append("\n  ");
-		if(_profile != null) {
-			buffer.append(_profile);
+		if(_bag != null) {
+			buffer.append(_bag);
 		} else {
-			buffer.append("No criminal profile");
+			buffer.append("Not holding any items at present");
 		}
 		
 		buffer.append("\n");
@@ -228,8 +222,8 @@ public class Avatar {
 				buffer.append(friend._id);
 				buffer.append("]");
 				buffer.append(" ");
-				if(friend._lastname != null) {
-					buffer.append(friend._lastname);
+				if(friend._username != null) {
+					buffer.append(friend._username);
 					buffer.append(", ");
 				}
 				if(friend._firstname != null) {
@@ -240,10 +234,13 @@ public class Avatar {
 			buffer.deleteCharAt(buffer.length()-1);
 		}
 		
-		if(!_movements.isEmpty()) {
+		if(!_achievements.isEmpty()) {
+			for (Achievement ach : _achievements){
+				buffer.append(ach.getAchievementName());
+			}
 			buffer.append("\n  Last known location: ");
-			Movement lastMovement = _movements.get(0);
-			buffer.append(lastMovement);
+			Achievement lastAchievement = _achievements.get(0);
+			buffer.append(lastAchievement);
 		}
 		
 		buffer.append(" }");
