@@ -6,24 +6,24 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 
-import nz.ac.auckland.avatar.domain.Address;
+import nz.ac.auckland.avatar.domain.Achievement;
 import nz.ac.auckland.avatar.domain.Bag;
-import nz.ac.auckland.avatar.domain.Curfew;
-import nz.ac.auckland.avatar.domain.Profile;
-import nz.ac.auckland.avatar.domain.Profile.Offence;
 import nz.ac.auckland.avatar.domain.Category;
-import nz.ac.auckland.avatar.domain.GeoPosition;
-import nz.ac.auckland.avatar.domain.Movement;
 import nz.ac.auckland.avatar.dto.Avatar;
 
 import org.joda.time.DateTime;
@@ -84,10 +84,10 @@ public class AvatarWebServiceTest {
 	 */
 	@Test
 	public void addAvatar() {
-		Address homeAddress = new Address("34", "Appleby Road", "Remuera",
-				"Auckland", "1070");
-		Avatar zoran = new Avatar("xXxmobixXx", "Zoran", Category.ROUGE,
-				new LocalDate(1958, 5, 17), homeAddress, null, new Bag());
+
+	
+		Avatar zoran = new Avatar("xXxmobixXx",  Category.ROUGE,
+				new LocalDate(1958, 5, 17),new Bag(), null);
 
 		Response response = _client
 				.target(WEB_SERVICE_URI).request()
@@ -109,15 +109,36 @@ public class AvatarWebServiceTest {
 		// returned by getId(), because the Web service assigns this when it
 		// creates a Avatar.
 		assertEquals(zoran.getUsername(), zoranFromService.getUsername());
-		assertEquals(zoran.getFirstname(), zoranFromService.getFirstname());
 		assertEquals(zoran.getCategory(), zoranFromService.getCategory());
 		assertEquals(zoran.getDateOfBirth(), zoranFromService.getDateOfBirth());
-		assertEquals(zoran.getHomeAddress(), zoranFromService.getHomeAddress());
-		assertEquals(zoran.getCurfew(), zoranFromService.getCurfew());
-		assertEquals(zoran.getLastKnownPosition(),
-				zoranFromService.getLastKnownPosition());
 		assertEquals(zoran.getBag(), zoranFromService.getBag());
 
+	}
+	
+	@Test
+	public void testXML() {
+		List<Achievement> achievements = new ArrayList<Achievement>();
+		achievements.add(new Achievement(1, DateTime.now(),"hahaha"));
+		
+		Avatar avatar = new Avatar("xXxmobixXx",  Category.ROUGE,
+				new LocalDate(1958, 5, 17),new Bag(), null);
+		 try {
+
+				File file = new File("C:\\file.xml");
+				JAXBContext jaxbContext = JAXBContext.newInstance(Avatar.class);
+				Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+				// output pretty printed
+				jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+				jaxbMarshaller.marshal(avatar, file);
+				jaxbMarshaller.marshal(avatar, System.out);
+
+			      } catch (JAXBException e) {
+				e.printStackTrace();
+			      }
+
+			}
 	}
 
 //	/**
@@ -305,4 +326,4 @@ public class AvatarWebServiceTest {
 //		// Oliver has 3 recorded movements.
 //		assertEquals(3, movementsForOliver.size());
 //	}
-}
+

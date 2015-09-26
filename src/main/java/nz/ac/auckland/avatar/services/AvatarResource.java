@@ -25,16 +25,12 @@ import org.joda.time.LocalTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nz.ac.auckland.avatar.domain.Address;
+import nz.ac.auckland.avatar.domain.Achievement;
 import nz.ac.auckland.avatar.domain.Avatar;
 import nz.ac.auckland.avatar.domain.Bag;
-import nz.ac.auckland.avatar.domain.Bag.ItemType;
 import nz.ac.auckland.avatar.domain.Category;
-import nz.ac.auckland.avatar.domain.Curfew;
-import nz.ac.auckland.avatar.domain.Profile;
-import nz.ac.auckland.avatar.domain.Profile.Offence;
-import nz.ac.auckland.avatar.domain.GeoPosition;
-import nz.ac.auckland.avatar.domain.Movement;
+import nz.ac.auckland.avatar.domain.Item;
+import nz.ac.auckland.avatar.domain.ItemType;
 import nz.ac.auckland.avatar.services.AvatarMapper;
 import nz.ac.auckland.avatar.services.AvatarResource;
 
@@ -79,7 +75,7 @@ public class AvatarResource {
 	}
 
 	/**
-	 * Records a new Movement for a particular Avatar.
+	 * Records a new achievement for a particular Avatar.
 	 * 
 	 * @param id
 	 *            the unique identifier of the Avatar.
@@ -88,12 +84,12 @@ public class AvatarResource {
 	 * 
 	 */
 	@POST
-	@Path("{id}/movements")
+	@Path("{id}/achievements")
 	@Consumes("application/xml")
-	public void createMovementForAvatar(@PathParam("id") long id,
-			Movement movement) {
+	public void createAchievementForAvatar(@PathParam("id") long id,
+			Achievement achievement) {
 		Avatar Avatar = findAvatar(id);
-		Avatar.addMovement(movement);
+		Avatar.addAchievement(achievement);
 	}
 
 	/**
@@ -114,13 +110,11 @@ public class AvatarResource {
 
 		// Update the Avatar object in the database based on the data in
 		// shortAvatar.
-		Avatar.setFirstname(dtoAvatar.getFirstname());
 		Avatar.setUsername(dtoAvatar.getUsername());
 		Avatar.setCategory(dtoAvatar.getCategory());
 		Avatar.setDateOfBirth(dtoAvatar.getDateOfBirth());
-		Avatar.setHomeAddress(dtoAvatar.getHomeAddress());
-		Avatar.setCurfew(dtoAvatar.getCurfew());
 		Avatar.setBag(dtoAvatar.getBag());
+		
 
 		// Ignore the last known location in dtoAvatar (i.e. the data in the
 		// HTTP request header).
@@ -150,7 +144,7 @@ public class AvatarResource {
 	}
 	
 	/**
-	 * Updates a Avatar's CriminalProfile.
+	 * Updates a Avatar's bag
 	 * @param id the unique identifier of the Avatar.
 	 * @param profile the Avatar's updated criminal profile.
 	 */
@@ -211,14 +205,14 @@ public class AvatarResource {
 	 * 
 	 */
 	@GET
-	@Path("{id}/movements")
+	@Path("{id}/achievements")
 	@Produces("application/xml")
-	public List<Movement> getMovements(@PathParam("id") long id) {
+	public List<Achievement> getAchievements(@PathParam("id") long id) {
 		// Get the full Avatar object from the database.
 		Avatar Avatar = findAvatar(id);
 
 		// Return the Avatar's movements.
-		return Avatar.getMovements();
+		return Avatar.getAchievements();
 	}
 
 	/**
@@ -246,7 +240,7 @@ public class AvatarResource {
 	}
 
 	/**
-	 * Returns the CriminalProfile for a particular Avatar.
+	 * Returns the bag for a particular Avatar.
 	 * @param id the unique identifier of the Avatar.
 	 */
 	@GET
@@ -270,46 +264,35 @@ public class AvatarResource {
 
 		// === Initialise Avatar #1
 		long id = _idCounter.incrementAndGet();
-		Address address = new Address("15", "Bermuda road", "St Johns", "Auckland", "1071");
 		Avatar Avatar = new Avatar(id,
 				"ellieille", 
-				"Oliver", 
-				Category.MAGE,
+				 Category.MAGE,
 				new LocalDate(1970, 5, 26),
-				address,
-				new Curfew(address, new LocalTime(20, 00),new LocalTime(06, 30)),
 				null);
 		_AvatarDB.put(id, Avatar);
 
 		Bag bag = new Bag();
 		
-		bag.addItem(new Bag.Item(5, 
+		bag.addItem(new Item(5, 
 				"Able to replenish a small amount of mana", 
 				ItemType.MANA_POTION));
 		Avatar.setBag(bag);
 		
 		// === Initialise Avatar #2
 		id = _idCounter.incrementAndGet();
-		address = new Address("22", "Tarawera Terrace", "St Heliers", "Auckland", "1071");
 		Avatar = new Avatar(id,
 				"lavitasy", 
-				"Catherine", 
 				Category.MONK,
 				new LocalDate(1970, 2, 9),
-				address,
-				null, new Bag());
+			  new Bag());
 		_AvatarDB.put(id, Avatar);
 		
 		// === Initialise Avatar #3
 		id = _idCounter.incrementAndGet();
-		address = new Address("67", "Drayton Gardens", "Oraeki", "Auckland", "1071");
 		Avatar = new Avatar(id,
-				"i_dont_know", 
-				"Nasser", 
+				"i_dont_know",
 				Category.BARBARIAN,
 				new LocalDate(1980, 10, 19),
-				address,
-				null,
 				null);
 		_AvatarDB.put(id, Avatar);
 	}

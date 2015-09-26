@@ -1,6 +1,10 @@
 package nz.ac.auckland.avatar.domain;
 
+import java.util.List;
+
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -19,19 +23,23 @@ import org.joda.time.format.DateTimeFormatter;
  * through the game
  */
 @Entity
-public class Achievement implements Comparable<Achievement> {
+public class Achievement {
 	@Id
+	@GeneratedValue( strategy = GenerationType.IDENTITY )
 	private long _id;
 
 	private String _achievementName;
 
 	private DateTime _timeRecieved;
-
+//the id of the quest the achievement is unlocked in
+	private long _questId;
+	
 	protected Achievement() {
 		// Required by JAXB for unmarshalling purposes.
 	}
 
-	public Achievement(long id, DateTime time, String name) {
+	public Achievement(long id, DateTime time,
+			String name) {
 		_id = id;
 		_timeRecieved = time;
 		_achievementName = name;
@@ -64,31 +72,22 @@ public class Achievement implements Comparable<Achievement> {
 	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Achievement))
-			return false;
-		if (obj == this)
-			return true;
+            return false;
+        if (obj == this)
+            return true;
 
-		Achievement ach = (Achievement) obj;
-		return new EqualsBuilder().
-				append(_id, ach._id).
-				append(_achievementName, ach._achievementName).
-				append(_timeRecieved, ach._timeRecieved).
-				isEquals();
+        Achievement achievement = (Achievement)obj;
+        return _id == achievement._id;
 	}
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 31). 
-				append(_id).
-				append(_achievementName).
-				append(_timeRecieved).
-				toHashCode();
+	            append(_id).
+	            toHashCode();
 	}
 
-	@Override
-	public int compareTo(Achievement achievement) {
-		return _timeRecieved.compareTo(achievement._timeRecieved);
-	}
+
 
 	@Override
 	public String toString() {

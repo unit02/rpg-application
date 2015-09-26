@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Entity;
+import javax.persistence.*;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -25,41 +25,48 @@ import org.joda.time.format.DateTimeFormatter;
  * A Avatar is uniquely identified by an id value of type Long.
  * 
  */
-//@Entity
+@Entity
 public class Avatar {
-	//@Id
-	//generator
+	@Id
+	@GeneratedValue( strategy = GenerationType.IDENTITY )
 	private long _id;
 	//@Colummn nullable = false, add many to one etc mapped by
 	private String _username;
-	private String _firstname;
 	private Category _category;
 	private LocalDate _dateOfBirth;
-	private Address _homeAddress;
-	private Curfew _curfew;
 	private Bag _bag;
 	private Set<Avatar> _friends;
 	private List<Achievement> _achievements;
 	
+	private Quest _currentQuest;
+	
 	
 	public Avatar(long id,
 			String username,
-			String firstname,
 			Category category,
 			LocalDate dateOfBirth,
-			Address address,
-			Curfew curfew,
 			Bag bag) {
 		_id = id;
 		_username = username;
-		_firstname = firstname;
 		_category = category;
 		_dateOfBirth = dateOfBirth;
-		_homeAddress = address;
-		_curfew = curfew;
 		_bag = bag;
 		_friends = new HashSet<Avatar>();
 		_achievements = new ArrayList<Achievement>();
+	}
+	
+	public Avatar(long id,
+			String username,
+			Category category,
+			LocalDate dateOfBirth,
+			Bag bag,
+			List<Achievement> achievement) {
+		_id = id;
+		_username = username;
+		_category = category;
+		_dateOfBirth = dateOfBirth;
+		_bag = bag;
+		_achievements = achievement;
 	}
 	
 
@@ -79,14 +86,6 @@ public class Avatar {
 		_username = username;
 	}
 	
-	public String getFirstname() {
-		return _firstname;
-	}
-	
-	public void setFirstname(String firstname) {
-		_firstname = firstname;
-	}
-	
 	public Category getCategory() {
 		return _category;
 	}
@@ -103,20 +102,12 @@ public class Avatar {
 		_dateOfBirth = dateOfBirth;
 	}
 	
-	public Address getHomeAddress() {
-		return _homeAddress;
+	public void setCurrentQuest(Quest quest){
+		_currentQuest = quest;
 	}
 	
-	public void setHomeAddress(Address homeAddress) {
-		_homeAddress = homeAddress;
-	}
-	
-	public Curfew getCurfew() {
-		return _curfew;
-	}
-	
-	public void setCurfew(Curfew curfew) {
-		_curfew = curfew;
+	public Quest getCurrentQuest() {
+		return _currentQuest;
 	}
 	
 	public Bag getBag() {
@@ -142,6 +133,12 @@ public class Avatar {
 		return Collections.unmodifiableList(_achievements);
 	}
 	
+	public Achievement getLatestAchievement(){
+		if (_achievements.isEmpty()){
+			return _achievements.get(0);
+		}
+		return null;
+	}
 	public void addFriend(Avatar avatar) {
 		_friends.add(avatar);
 	}
@@ -172,9 +169,7 @@ public class Avatar {
 			buffer.append(_username);
 			buffer.append(", ");
 		}
-		if(_firstname != null) {
-			buffer.append(_firstname);
-		}
+
 		buffer.append("; ");
 		if(_category != null) {
 			buffer.append(_category);
@@ -183,26 +178,6 @@ public class Avatar {
 		
 		if(_dateOfBirth != null) {
 			buffer.append(dOfBFormatter.print(_dateOfBirth));
-		}
-		buffer.append("\n  ");
-		if(_homeAddress != null) {
-			buffer.append(_homeAddress);
-		}
-		
-		if(_curfew != null) {
-			buffer.append("\n  Curfew from ");
-			buffer.append(timeFormatter.print(_curfew.getStartTime()));
-			buffer.append(" to ");
-			buffer.append(timeFormatter.print(_curfew.getEndTime()));
-			buffer.append(" @ ");
-			
-			if(_homeAddress != null && _homeAddress.equals(_curfew.getConfinementAddress())) {
-				buffer.append("home");
-			} else {
-				buffer.append(_curfew.getConfinementAddress());
-			}
-		} else {
-			buffer.append("No curfew conditions");
 		}
 		
 		buffer.append("\n  ");
@@ -225,9 +200,6 @@ public class Avatar {
 				if(friend._username != null) {
 					buffer.append(friend._username);
 					buffer.append(", ");
-				}
-				if(friend._firstname != null) {
-					buffer.append(friend._firstname);
 				}
 				buffer.append(";");
 			}

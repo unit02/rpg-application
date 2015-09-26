@@ -1,17 +1,21 @@
 package nz.ac.auckland.avatar.dto;
 
 import javax.xml.bind.annotation.XmlAccessorType;
+
+import java.util.List;
+import java.util.Set;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import nz.ac.auckland.avatar.domain.Address;
+import nz.ac.auckland.avatar.domain.Achievement;
 import nz.ac.auckland.avatar.domain.Bag;
-import nz.ac.auckland.avatar.domain.Curfew;
 import nz.ac.auckland.avatar.domain.Category;
-import nz.ac.auckland.avatar.domain.Movement;
 import nz.ac.auckland.parolee.jaxb.LocalDateAdapter;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -27,8 +31,7 @@ import org.joda.time.format.DateTimeFormatter;
  * clients and the Avatar Web service.
  * 
  * A DTO Avatar is described by:
- * - Personal details: lastname, firstname, gender, date-of-birth, home address;
- * - Curfew: any constraints on the Avatar's location;
+ * - Personal details: lastname, gender, date-of-birth, home address;
  * - Criminal profile: criminal history of the Avatar;
  * - Last know location: timestamped latitude/longitude position.
  * 
@@ -39,14 +42,15 @@ import org.joda.time.format.DateTimeFormatter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Avatar {
 	
+	@XmlID
+	@XmlAttribute(name="xml-id")
+	 private String _xmlId; 
+	
 	@XmlAttribute(name="id")
 	private long _id;
 	
 	@XmlElement(name="user-name")
 	private String _username;
-	
-	@XmlElement(name="first-name")
-	private String _firstname;
 	
 	@XmlElement(name="category")
 	private Category _category;
@@ -55,21 +59,14 @@ public class Avatar {
 	@XmlJavaTypeAdapter(value=LocalDateAdapter.class)
 	private LocalDate _dateOfBirth;
 	
-	@XmlElement(name="home-address")
-	private Address _homeAddress;
-	
-	@XmlElement(name="curfew")
-	private Curfew _curfew;
-	
-	@XmlElement(name="last-known-position")
-	private Movement _lastKnownPosition;
+	@XmlIDREF
+	@XmlElement(name="achievements")
+	private List<Achievement> _achievements;
 	
 	@XmlElement(name="bag")
 	private Bag _bag;
+
 	
-	protected Avatar() {
-		
-	}
 	
 	/**
 	 * Constructs a DTO Avatar instance. This method is intended to be called
@@ -81,14 +78,15 @@ public class Avatar {
      *
 	 */
 	public Avatar(String username,
-			String firstname,
 			Category category,
 			LocalDate dateOfBirth,
-			Address homeAddress,
-			Curfew curfew,
-			Bag bag) throws IllegalArgumentException {
-		this(0,username,firstname,category,dateOfBirth,homeAddress,curfew, null, bag );
-	}
+			Bag bag,
+			List<Achievement> list) throws IllegalArgumentException {
+		_username = username;
+		_category = category;
+		_dateOfBirth = dateOfBirth;
+		_achievements = list;
+		_bag = bag;}
 	
 	/**
 	 * Constructs a DTO Avatar instance. This method should NOT be called by 
@@ -98,27 +96,28 @@ public class Avatar {
 	 */
 	public Avatar(long id,
 			String username,
-			String firstname,
 			Category category,
 			LocalDate dateOfBirth,
-			Address homeAddress,
-			Curfew curfew,
-			Movement lastKnownPosition,
-			Bag bag) {
+			Bag bag,
+			List<Achievement> list) {
 		_id = id;
+		_xmlId = getClass().getName() + id;
 		_username = username;
-		_firstname = firstname;
 		_category = category;
 		_dateOfBirth = dateOfBirth;
-		_homeAddress = homeAddress;
-		_curfew = curfew;
-		_lastKnownPosition = lastKnownPosition;
+		_achievements = list;
 		_bag = bag;
 	}
+	
 	
 	public long getId() {
 		return _id;
 	}
+	
+	public void setId(long id) {
+		 _id = id;
+		 _xmlId = getClass().getName() + _id;
+		}
 	
 	public String getUsername() {
 		return _username;
@@ -126,14 +125,6 @@ public class Avatar {
 	
 	public void setUsername(String username) {
 		_username = username;
-	}
-	
-	public String getFirstname() {
-		return _firstname;
-	}
-	
-	public void setFirstname(String firstname) {
-		_firstname = firstname;
 	}
 	
 	public Category getCategory() {
@@ -152,29 +143,14 @@ public class Avatar {
 		_dateOfBirth = dateOfBirth;
 	}
 	
-	public Address getHomeAddress() {
-		return _homeAddress;
-	}
-	
-	public void setHomeAddress(Address homeAddress) {
-		_homeAddress = homeAddress;
-	}
-	
-	public Curfew getCurfew() {
-		return _curfew;
-	}
-	
-	public void setCurfew(Curfew curfew) {
-		_curfew = curfew;
-	}
-	
-	public Movement getLastKnownPosition() {
-		return _lastKnownPosition;
+	public List<Achievement> getAchievements() {
+		return _achievements;
 	}
 	
 	public Bag getBag() {
 		return _bag;
 	}
+	
 	
 	@Override
 	public String toString() {
@@ -190,9 +166,7 @@ public class Avatar {
 			buffer.append(_username);
 			buffer.append(", ");
 		}
-		if(_firstname != null) {
-			buffer.append(_firstname);
-		}
+	
 		buffer.append("; ");
 		if(_category != null) {
 			buffer.append(_category);
@@ -202,27 +176,8 @@ public class Avatar {
 		if(_dateOfBirth != null) {
 			buffer.append(dOfBFormatter.print(_dateOfBirth));
 		}
-		buffer.append("\n  ");
-		if(_homeAddress != null) {
-			buffer.append(_homeAddress);
-		}
-		
-		buffer.append("\n  ");
-		if(_curfew != null) {
-			buffer.append("\n  Curfew from ");
-			buffer.append(timeFormatter.print(_curfew.getStartTime()));
-			buffer.append(" to ");
-			buffer.append(timeFormatter.print(_curfew.getEndTime()));
-			buffer.append(" @ ");
-			
-			if(_homeAddress != null && _homeAddress.equals(_curfew.getConfinementAddress())) {
-				buffer.append("home");
-			} else {
-				buffer.append(_curfew.getConfinementAddress());
-			}
-		} else {
-			buffer.append("No curfew conditions");
-		}
+
+
 		buffer.append("\n  ");
 		if(_bag != null) {
 			buffer.append(_bag);
@@ -245,10 +200,8 @@ public class Avatar {
         return new EqualsBuilder().
             append(_id, ava._id).
             append(_username, ava._username).
-            append(_firstname, ava._firstname).
             append(_category, ava._category).
             append(_dateOfBirth, ava._dateOfBirth).
-            append(_homeAddress, ava._homeAddress).
             append(_bag, ava._bag).
             isEquals();
 	}
@@ -258,13 +211,13 @@ public class Avatar {
 		return new HashCodeBuilder(17, 31). 
 	            append(_id).
 	            append(_username).
-	            append(_firstname).
 	            append(_category).
 	            append(_dateOfBirth).
-	            append(_homeAddress).
 	            append(_bag).
 	            toHashCode();
 	}
+
+
 }
 
 

@@ -1,6 +1,14 @@
 package nz.ac.auckland.avatar.services;
 
+import java.util.List;
+import java.util.Set;
+
+import org.joda.time.LocalDate;
+
+import nz.ac.auckland.avatar.domain.Achievement;
 import nz.ac.auckland.avatar.domain.Avatar;
+import nz.ac.auckland.avatar.domain.Bag;
+import nz.ac.auckland.avatar.domain.Category;
 
 /**
  * Helper class to convert between domain-model and DTO objects representing
@@ -12,14 +20,13 @@ import nz.ac.auckland.avatar.domain.Avatar;
 public class AvatarMapper {
 
 	static Avatar toDomainModel(nz.ac.auckland.avatar.dto.Avatar dtoavatar) {
-		Avatar fullavatar = new Avatar(dtoavatar.getId(),
+		Avatar fullavatar = new Avatar(
+				dtoavatar.getId(),
 				dtoavatar.getUsername(),
-				dtoavatar.getFirstname(),
 				dtoavatar.getCategory(),
 				dtoavatar.getDateOfBirth(),
-				dtoavatar.getHomeAddress(),
-				dtoavatar.getCurfew(), 
-				dtoavatar.getBag());
+				dtoavatar.getBag(),
+				dtoavatar.getAchievements());
 		return fullavatar;
 	}
 	
@@ -28,13 +35,10 @@ public class AvatarMapper {
 				new nz.ac.auckland.avatar.dto.Avatar(
 						avatar.getId(),
 						avatar.getUsername(),
-						avatar.getFirstname(),
 						avatar.getCategory(),
 						avatar.getDateOfBirth(),
-						avatar.getHomeAddress(),
-						avatar.getCurfew(),
-						avatar.getLastKnownPosition(),
-						avatar.getBag());
+						avatar.getBag(), 
+						avatar.getAchievements());
 		return dtoavatar;
 		
 	}

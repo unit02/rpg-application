@@ -1,29 +1,29 @@
-package nz.ac.auckland.avatar.domain;
+package nz.ac.auckland.avatar.dto;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Embeddable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.joda.time.LocalDate;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import nz.ac.auckland.avatar.domain.Item;
 
-/** 
- *Represents the avatar's bag. Holds items.
- */
-@Embeddable
+@XmlRootElement(name="bag")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Bag {
 
+    @XmlElementWrapper(name="items")
+    @XmlElement(name="item")
 	private Set<Item> _items;
 	
 	public Bag() {
